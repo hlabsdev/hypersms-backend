@@ -26,14 +26,14 @@ class ClientSerializer(serializers.ModelSerializer):
 class ConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = Config
-        fields = ['id', 'entete', 'client', 'is_default', 'is_actif']
+        fields = ['url', 'id', 'entete', 'client', 'is_default', 'is_actif']
         read_only_fields = ["is_actif"]
         
                 
 class PayementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payement
-        fields = ['id', 'libelle', 'amount', 'date', 'payed', 'souscription']
+        fields = ['url', 'id', 'libelle', 'amount', 'date', 'payed', 'souscription']
         read_only_fields = ["payed"]
         
           
@@ -41,14 +41,14 @@ class SouscriptionSerializer(serializers.ModelSerializer):
     payements = PayementSerializer(many=True, read_only=True)
     class Meta:
         model = Souscription
-        fields = ['id', 'numero', 'plan', 'client', 'date', 'nbr_sms_sent', 'nbr_sms_rem', 'to_be_payed', 'is_payed', 'is_actif', 'tag', 'payements']
+        fields = ['url', 'id', 'numero', 'plan', 'client', 'date', 'nbr_sms_sent', 'nbr_sms_rem', 'to_be_payed', 'is_payed', 'is_actif', 'tag', 'payements']
         read_only_fields = ["numero", "to_be_payed", "is_payed", "is_actif", "nbr_sms_sent", "nbr_sms_rem"]
         
         
 class PlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plan
-        fields = ['id', 'title', 'nbr_sms', 'price', 'tarif', 'is_actif']
+        fields = ['url', 'id', 'title', 'nbr_sms', 'price', 'tarif', 'is_actif']
         read_only_fields = ['is_actif', 'tarif']
         
         
@@ -65,7 +65,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class SmsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sms
-        fields = ['id', 'sender', 'receptor', 'text', 'date', 'client', 'taille', 'status']
+        fields = ['url', 'id', 'sender', 'receptor', 'text', 'date', 'client', 'taille', 'status']
         read_only_fields = ['status', 'taille']
         
         

@@ -74,9 +74,9 @@ def login(request, format=None):
             password=serializer.data.get('password'),
         )
         if client is not None:
-            token = Token.objects.get_or_create(user=client)
+            token, create_or_fetch = Token.objects.get_or_create(user=client)
             if client.is_active:
-                serial_user = ProfileSerializer(client)
+                serial_user = ProfileSerializer(client, context={'request': request})
                 return Response({'token': token.key, 'user': serial_user.data}, status=status.HTTP_200_OK)
             else:
                 msg = "Votre compte n'est pas activée! Veuillez contacter le service clientele"
@@ -116,7 +116,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def get_deleted_list(self, request):
         objet = self.get_object().deleted_objects.all().order_by('-deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     # Methodes suplementaire end
 
@@ -141,7 +141,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated], methods=['GET'])
     def get_deleted_list(self, request):
         objet = self.get_objects().deleted_objects.all().order_by('deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OKstatus.HTTP_200_OK)
     # Methodes suplementaire end
 
@@ -166,7 +166,7 @@ class ClientSmsViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def get_deleted_list(self, request):
         objet = self.get_object().deleted_objects.all().order_by('-deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     # Methodes suplementaire end
 
@@ -191,7 +191,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def get_deleted_list(self, request):
         objet = self.get_object().deleted_objects.all().order_by('-deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     # Methodes suplementaire end
 
@@ -216,7 +216,7 @@ class SouscriptionViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def get_deleted_list(self, request):
         objet = self.get_object().deleted_objects.all().order_by('-deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     # Methodes suplementaire end
 
@@ -241,7 +241,7 @@ class PayementViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def get_deleted_list(self, request):
         objet = self.get_object().deleted_objects.all().order_by('-deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     # Methodes suplementaire end
 
@@ -266,7 +266,7 @@ class ConfigViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def get_deleted_list(self, request):
         objet = self.get_object().deleted_objects.all().order_by('-deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     # Methodes suplementaire end
 
@@ -277,7 +277,8 @@ class SmsViewSet(viewsets.ModelViewSet):
     serializer_class = SmsSerializer
     permission_classes = [permissions.IsAuthenticated]
     def create(self, request):
-        user = get_user_by_token(request.headers.get('Authorization'))
+        # user = get_user_by_token(request.headers.get('Authorization'))
+        user = request.user
         if user:
             serializer = SmsSerializer(data=request.data)
             souscription = Souscription.objects.get(client=user)
@@ -296,7 +297,7 @@ class SmsViewSet(viewsets.ModelViewSet):
                 sms.save()
                 if sent == 1:
                     souscription.send_sms(sms.text.__len__())
-                    return Response({'message':"message envoyé avec success", "sms": SmsSerializer(sms).data}, status=status.HTTP_200_OK)
+                    return Response({'message':"message envoyé avec success", "sms": SmsSerializer(sms, context={'request': request}).data}, status=status.HTTP_200_OK)
                 elif sent == 2:
                     return Response({'message':"échec au moment de l'envoie du message", "code":4})
                 else:
@@ -319,6 +320,6 @@ class SmsViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def get_deleted_list(self, request):
         objet = self.get_object().deleted_objects.all().order_by('-deleted_at')
-        serializer = self.get_serializer(objet, many=True)
+        serializer = self.get_serializer(objet, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     # Methodes suplementaire end
