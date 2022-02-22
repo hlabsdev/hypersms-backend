@@ -1,0 +1,14 @@
+// Envoie d'sms
+{
+  "message": "message envoyé avec success",
+  "sms": {
+    "id": 8,
+    "sender": "AIR.NET",
+    "receptor": "22890532535",
+    "text": "INFO D'USAGE: L'appli mobile n'etant pas dispo, pour envoyer des sms faite signe au 91025263/98660436. Le numero du receveur doit ressembler a 22890532535. Eviter les accents et caracteres speciaux dans le text d'sms. Un sms normal contien 160 lettres, si ca depasse, le nbr d'sms diminue en fonction. SOLDE:50 SMS",
+    "date": "2022-02-22T18:02:45.516755Z",
+    "client": 1,
+    "taille": "314 Carateres, equivalent à 2 sms",
+    "status": 1
+  }
+}
