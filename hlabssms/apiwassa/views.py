@@ -61,6 +61,7 @@ def sendSms(sms:Sms):
     3: Erreur du serveur
     4: Message non envoyé
     5: Message en attente d'envoie
+    6: Solde insufisant
 }
 """
 
@@ -279,31 +280,34 @@ class SmsViewSet(viewsets.ModelViewSet):
     def create(self, request):
         # user = get_user_by_token(request.headers.get('Authorization'))
         user = request.user
-        if user:
+        if user.is_active:
             serializer = SmsSerializer(data=request.data)
             souscription = Souscription.objects.get(client=user)
-            if serializer.is_valid():
-                sms = Sms(
-                    sender=request.data.get('sender'),
-                    receptor=request.data.get('receptor'),
-                    text=request.data.get('text'),
-                    client=user
-                )
-                sent = sendSms(sms)
-                sms.status = sent
-                # serializer = SmsSerializer(sms)
-                # if serializer.is_valid():
-                # return Response({'message': serializer.errors, "code":3})
-                sms.save()
-                if sent == 1:
-                    souscription.send_sms(sms.text.__len__())
-                    return Response({'message':"message envoyé avec success", "sms": SmsSerializer(sms, context={'request': request}).data}, status=status.HTTP_200_OK)
-                elif sent == 2:
-                    return Response({'message':"échec au moment de l'envoie du message", "code":4})
-                else:
-                    souscription.send_sms(sms.text.__len__())
-                    return Response({'message':"message en attente d'envoie", "code":5})
-            return Response({'message': serializer.errors, "code":3})
+            msg_consumed = (request.data.get('text').__len__() / 160).__ceil__()
+            if souscription.nbr_sms_rem > 0 or souscription.nbr_sms_rem > msg_consumed:
+                if serializer.is_valid():
+                    sms = Sms(
+                        sender=request.data.get('sender'),
+                        receptor=request.data.get('receptor'),
+                        text=request.data.get('text'),
+                        client=user
+                    )
+                    sent = sendSms(sms)
+                    sms.status = sent
+                    # serializer = SmsSerializer(sms)
+                    # if serializer.is_valid():
+                    # return Response({'message': serializer.errors, "code":3})
+                    sms.save()
+                    if sent == 1:
+                        souscription.send_sms(sms.text.__len__())
+                        return Response({'message':"message envoyé avec success", "sms": SmsSerializer(sms, context={'request': request}).data}, status=status.HTTP_200_OK)
+                    elif sent == 2:
+                        return Response({'message':"échec au moment de l'envoie du message", "code":4})
+                    else:
+                        souscription.send_sms(sms.text.__len__())
+                        return Response({'message':"message en attente d'envoie", "code":5})
+                return Response({'message': serializer.errors, "code":3})
+            return Response({'message': "Solde insufisant", "code":6})
         return Response({'message': "Not authorised", "code":3})
     
     # Methodes suplementaire start

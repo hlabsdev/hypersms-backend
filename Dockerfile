@@ -16,6 +16,6 @@ RUN python3 manage.py migrate
 EXPOSE 8000
 EXPOSE 8080
 EXPOSE 80
-# CMD ["gunicorn", "hlabssms.wsgi", "--reload", "-b", "0.0.0.0:8000", "--access-logfile", "-"]
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "hlabssms.wsgi", "--reload", "-b", "0.0.0.0:8000", "--access-logfile", "-"]
+# CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 
