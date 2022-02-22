@@ -16,5 +16,5 @@ RUN python3 manage.py migrate
 EXPOSE 8000
 EXPOSE 8080
 EXPOSE 80
-CMD ["gunicorn", "fintech.wsgi", "--reload", "-b", "0.0.0.0:8000", "--access-logfile", "-"]
+CMD ["gunicorn", "hlabssms.wsgi", "--reload", "-b", "0.0.0.0:8000", "--access-logfile", "-"]
 
